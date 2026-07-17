@@ -275,7 +275,8 @@
     transition: opacity 0.8s ease, transform 0.8s ease;
   }
 
-  .lembar h1 {
+  .lembar h1,
+  .judul-isi {
     font-size: clamp(1.9rem, 6vw, 2.6rem); text-align: center; margin-bottom: 1.6rem;
     opacity: 0; transform: translateY(8px);
     transition: opacity 0.8s ease 0.15s, transform 0.8s ease 0.15s;
@@ -293,7 +294,7 @@
   }
   .paragraf .joke { display: block; margin-top: 0.35rem; font-size: 0.9rem; color: #C9773E; }
 
-  .paragraf.show, .lembar-eyebrow.show, .lembar h1.show, .divider.show {
+  .paragraf.show, .lembar-eyebrow.show, .lembar h1.show, .judul-isi.show, .divider.show {
     opacity: 1; transform: translateY(0);
   }
 
@@ -302,6 +303,18 @@
     opacity: 0; transition: opacity 1s ease;
   }
   .tanda-tangan.show { opacity: 1; }
+
+  .copyright-bottom-left {
+    position: fixed;
+    left: 1rem;
+    bottom: 0.8rem;
+    z-index: 2;
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+    color: rgba(244,242,250,0.45);
+    text-align: left;
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
@@ -361,7 +374,7 @@
   <div class="isi">
     <div class="lembar" id="lembar">
       <p class="lembar-eyebrow" id="eyebrow">Selamat Ulang Tahun</p>
-      <p><h3 class="display" id="judulIsi">Nindya Absari Burhan <br> Yang ke 21 Tahun.</h3><p/>
+      <h3 class="display judul-isi" id="judulIsi">Nindya Absari Burhan <br> Yang ke 21 Tahun.</h3>
       <div class="divider" id="divider"></div>
 
       <p class="paragraf" id="p1">Nggak nyangka ya kita ketemu lagi diKampus. Padahal dulu cuma temen sebangku pas MI, eh sekarang malah aku yang jadi kating kamu di kampus. Dunia emang suka bercanda ya... soal beginian.<span class="joke">Dunia emang cepet banget berputarnya😅</span></p>
