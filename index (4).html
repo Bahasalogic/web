@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Selamat Ulang Tahun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background-color: #0B0C22;
+    color: #F4F2FA;
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    overflow-x: hidden;
+  }
+
+  #bgAmbient {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  section {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  section.active { display: flex; }
+
+  /* ---------- SECTION 1: PEMBUKA ---------- */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .pembuka-ornamen {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 1.4rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards;
+  }
+
+  .pembuka-eyebrow {
+    font-size: 0.75rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #F4C95D;
+    margin-bottom: 1.1rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards;
+    animation-delay: 0.25s;
+  }
+
+  .kalimat {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: clamp(1.7rem, 6vw, 2.6rem);
+    line-height: 1.4;
+    max-width: 560px;
+    margin-bottom: 2.4rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards;
+    animation-delay: 0.55s;
+  }
+
+  #mulaiBtn {
+    opacity: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    animation: fadeUp 1s ease forwards;
+    animation-delay: 0.95s;
+  }
+  #mulaiBtn .panah { display: inline-block; transition: transform 0.25s ease; }
+  #mulaiBtn:hover .panah { transform: translateX(4px); }
+
+  button {
+    padding: 0.9rem 1.8rem;
+    border-radius: 999px;
+    border: none;
+    background-color: #F4C95D;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  button:hover { transform: translateY(-2px); }
+
+  /* ---------- SECTION 2: TIMELINE ---------- */
+  .timeline h2 {
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    margin-bottom: 2.5rem;
+  }
+
+  .stop {
+    max-width: 480px;
+    margin-bottom: 2rem;
+    text-align: left;
+    border-left: 3px solid #F4C95D;
+    padding-left: 1.2rem;
+  }
+
+  .stop .tag {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #F4C95D;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  .stop h3 { font-size: 1.3rem; margin-bottom: 0.4rem; }
+  .stop p { color: #B9B7D6; font-size: 0.95rem; line-height: 1.5; }
+
+  .dodge-zone {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 100px;
+    margin-top: 1.5rem;
+  }
+
+  #dodgeBtn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+  }
+
+  #dodgeBtn.caught {
+    background-color: #FF8FA3;
+  }
+
+  #dodgeNote {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: #B9B7D6;
+    min-height: 1.2em;
+  }
+
+  #lanjutFinaleBtn {
+    margin-top: 2rem;
+    display: none;
+  }
+
+  /* ---------- SECTION 3: FINALE (kartu-surat) ---------- */
+  .finale {
+    background: transparent;
+    position: relative;
+    padding: 0;
+  }
+
+  .display { font-family: 'Fraunces', serif; }
+  .script { font-family: 'Cormorant Garamond', serif; font-style: italic; }
+
+  #petalCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .sampul {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    transition: opacity 1.1s ease, transform 1.1s ease;
+  }
+  .sampul.hidden {
+    opacity: 0;
+    transform: scale(1.04);
+    pointer-events: none;
+  }
+
+  .kartu-tertutup {
+    width: min(340px, 90vw);
+    aspect-ratio: 3/4;
+    background: #FFFDF9;
+    border-radius: 4px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.35);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    cursor: pointer;
+    border: 1px solid rgba(74,58,50,0.08);
+    color: #4A3A32;
+  }
+
+  .kartu-tertutup::before {
+    content: "";
+    position: absolute;
+    inset: 14px;
+    border: 1px solid rgba(212,163,115,0.4);
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  .ornamen { width: 56px; height: 56px; margin-bottom: 1.2rem; opacity: 0.75; }
+
+  .kartu-tertutup .judul { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .kartu-tertutup .sub { font-size: 0.85rem; color: #9C8A7A; margin-bottom: 1.6rem; }
+
+  .seal {
+    width: 46px; height: 46px; border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #E8A96B, #C9773E 75%);
+    color: #FFF7EB;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: 0 8px 18px rgba(201,119,62,0.35);
+    transition: transform 0.3s ease;
+  }
+  .kartu-tertutup:hover .seal { transform: scale(1.08) rotate(-4deg); }
+
+  .tap-note {
+    margin-top: 1rem; font-size: 0.72rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #B8A18E;
+  }
+
+  .isi {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6vh 5vw;
+  }
+
+  .lembar {
+    width: min(560px, 100%);
+    background: #FFFDF9;
+    color: #4A3A32;
+    border-radius: 6px;
+    box-shadow: 0 30px 70px rgba(0,0,0,0.35);
+    padding: clamp(2rem, 6vw, 3.4rem);
+    position: relative;
+    border: 1px solid rgba(74,58,50,0.07);
+  }
+
+  .lembar::before {
+    content: ""; position: absolute; inset: 12px;
+    border: 1px solid rgba(212,163,115,0.35); border-radius: 3px; pointer-events: none;
+  }
+
+  .lembar-eyebrow {
+    font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+    color: #C9773E; text-align: center; margin-bottom: 1rem;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .lembar h1 {
+    font-size: clamp(1.9rem, 6vw, 2.6rem); text-align: center; margin-bottom: 1.6rem;
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.8s ease 0.15s, transform 0.8s ease 0.15s;
+  }
+
+  .divider {
+    width: 60px; height: 1px; background: rgba(201,119,62,0.4);
+    margin: 0 auto 1.8rem; opacity: 0; transition: opacity 1s ease 0.3s;
+  }
+
+  .paragraf {
+    font-size: 1.02rem; line-height: 1.85; color: #5C4B41; margin-bottom: 1.3rem;
+    opacity: 0; transform: translateY(10px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+  .paragraf .joke { display: block; margin-top: 0.35rem; font-size: 0.9rem; color: #C9773E; }
+
+  .paragraf.show, .lembar-eyebrow.show, .lembar h1.show, .divider.show {
+    opacity: 1; transform: translateY(0);
+  }
+
+  .tanda-tangan {
+    text-align: center; margin-top: 2rem; font-size: 1.3rem; color: #C9773E;
+    opacity: 0; transition: opacity 1s ease;
+  }
+  .tanda-tangan.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<canvas id="bgAmbient"></canvas>
+
+<section class="pembuka active">
+  <svg class="pembuka-ornamen" viewBox="0 0 64 64" fill="none">
+    <path d="M32 10 C24 20, 14 22, 10 32 C14 42, 24 44, 32 54 C40 44, 50 42, 54 32 C50 22, 40 20, 32 10 Z" stroke="#F4C95D" stroke-width="1.3"/>
+    <circle cx="32" cy="32" r="3" fill="#F4C95D"/>
+  </svg>
+  <p class="pembuka-eyebrow">sebuah pesan kecil, untukmu</p>
+  <p class="kalimat">Ternyata jalan kita suka iseng ya.</p>
+  <button id="mulaiBtn">Lanjut <span class="panah">→</span></button>
+</section>
+
+<section class="timeline" id="sectionTimeline">
+  <h2>Jalan yang Udah Dilewatin</h2>
+
+  <div class="stop">
+    <span class="tag">MI · dulu banget</span>
+    <h3>Temen Sebangku</h3>
+    <p>Ketemu pertama kali di bangku sekolah. Nggak nyangka ini baru awal dari cerita yang muter lagi bertahun-tahun kemudian.</p>
+  </div>
+
+  <div class="stop">
+    <span class="tag">Kampus · sekarang</span>
+    <h3>Ketemu Lagi, Jadi Kating</h3>
+    <p>Dunia emang suka bercanda — anak sebangku waktu MI, eh malah jadi kating pas di kampus.</p>
+  </div>
+
+  <p style="max-width:420px; color:#B9B7D6; font-size:0.95rem;">Btw, gua tau kamu tipe yang jarang butuh bantuan orang lain. Coba klik tombol ini deh.</p>
+  <div class="dodge-zone">
+    <button id="dodgeBtn">Butuh bantuan?</button>
+  </div>
+  <p id="dodgeNote"></p>
+
+  <button id="lanjutFinaleBtn">Lanjut →</button>
+</section>
+
+<section class="finale">
+  <canvas id="petalCanvas"></canvas>
+
+  <div class="sampul" id="sampul">
+    <div class="kartu-tertutup" id="kartuTertutup">
+      <svg class="ornamen" viewBox="0 0 64 64" fill="none">
+        <path d="M32 10 C24 20, 14 22, 10 32 C14 42, 24 44, 32 54 C40 44, 50 42, 54 32 C50 22, 40 20, 32 10 Z" stroke="#C9773E" stroke-width="1.3"/>
+        <circle cx="32" cy="32" r="3" fill="#C9773E"/>
+      </svg>
+      <p class="judul display">Untuk Kamu</p>
+      <p class="sub">sebuah kartu kecil</p>
+      <div class="seal">✉</div>
+      <p class="tap-note">ketuk buat buka</p>
+    </div>
+  </div>
+
+  <div class="isi">
+    <div class="lembar" id="lembar">
+      <p class="lembar-eyebrow" id="eyebrow">Selamat Ulang Tahun</p>
+      <h1 class="display" id="judulIsi">Untuk Kamu.</h1>
+      <div class="divider" id="divider"></div>
+
+      <p class="paragraf" id="p1">Nggak nyangka udah ketemu lagi ya. Dulu cuma temen sebangku pas MI, eh sekarang malah gua yang jadi kating kamu di kampus.</p>
+      <p class="paragraf" id="p2">Dunia emang suka bercanda soal beginian.<span class="joke">*karma emang cepet banget prosesnya 😄</span></p>
+      <p class="paragraf" id="p3">Semoga tahun ini semua yang kamu usahain berjalan lancar. Tetep jadi orang yang bisa handle semuanya sendiri, tapi jangan lupa buat ketawa lepas sesekali.</p>
+      <p class="paragraf" id="p4">Selamat ulang tahun ya. 🎉</p>
+
+      <p class="tanda-tangan script" id="ttd">— dari temen sebangku MI-mu</p>
+    </div>
+  </div>
+</section>
+
+<audio id="musikPembuka" loop preload="auto">
+  <source src="Reflective Piano.mp3" type="audio/mpeg">
+</audio>
+<audio id="musikTimeline" loop preload="auto">
+  <source src="Calmness Piano.mp3" type="audio/mpeg">
+</audio>
+<audio id="musikFinale" loop preload="auto">
+  <source src="Warm Piano.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  /* ============================================================
+     BAGIAN 0: BACKGROUND AMBIENT — bintang berkelip + cahaya lembut
+     ============================================================ */
+  const bgCanvas = document.getElementById("bgAmbient");
+  const bgCtx = bgCanvas.getContext("2d");
+
+  function resizeBg() {
+    bgCanvas.width = window.innerWidth;
+    bgCanvas.height = window.innerHeight;
+  }
+  window.addEventListener("resize", resizeBg);
+  resizeBg();
+
+  // titik-titik bintang: tiap satu punya kecepatan kelip + arah geser sendiri
+  const bintang = Array.from({ length: 90 }, () => ({
+    x: Math.random() * bgCanvas.width,
+    y: Math.random() * bgCanvas.height,
+    r: Math.random() * 1.4 + 0.4,
+    fase: Math.random() * Math.PI * 2,
+    kecepatan: Math.random() * 0.02 + 0.008,
+    vx: (Math.random() - 0.5) * 0.06,
+    vy: Math.random() * 0.05 + 0.015
+  }));
+
+  // awan cahaya lonjong yang melayang menyeberang layar
+  const awan = Array.from({ length: 4 }, (_, i) => ({
+    x: Math.random() * bgCanvas.width,
+    y: bgCanvas.height * (0.15 + i * 0.22) + Math.random() * 60,
+    lebar: 260 + Math.random() * 160,
+    v: 0.06 + Math.random() * 0.08,
+    c: ["rgba(139,158,255,0.10)", "rgba(255,143,163,0.09)", "rgba(244,201,93,0.08)", "rgba(217,166,194,0.08)"][i % 4]
+  }));
+
+  function animasiBg() {
+    bgCtx.fillStyle = "#0B0C22";
+    bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+    // gumpalan cahaya besar yang gerak pelan mengambang (statis di tengah)
+    const t = Date.now() * 0.00018;
+    const gumpalan = [
+      { x: bgCanvas.width * 0.22 + Math.sin(t) * 60, y: bgCanvas.height * 0.28, c: "rgba(139,158,255,0.12)" },
+      { x: bgCanvas.width * 0.8 + Math.cos(t * 1.3) * 70, y: bgCanvas.height * 0.55, c: "rgba(255,143,163,0.10)" },
+      { x: bgCanvas.width * 0.5 + Math.sin(t * 0.7) * 50, y: bgCanvas.height * 0.85, c: "rgba(244,201,93,0.09)" }
+    ];
+    gumpalan.forEach(g => {
+      const grad = bgCtx.createRadialGradient(g.x, g.y, 0, g.x, g.y, 280);
+      grad.addColorStop(0, g.c);
+      grad.addColorStop(1, "transparent");
+      bgCtx.fillStyle = grad;
+      bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+    });
+
+    // awan yang benar-benar melayang menyeberang layar, lalu muncul lagi dari sisi kiri
+    awan.forEach(a => {
+      a.x += a.v;
+      if (a.x - a.lebar > bgCanvas.width) a.x = -a.lebar;
+      const grad = bgCtx.createRadialGradient(a.x, a.y, 0, a.x, a.y, a.lebar);
+      grad.addColorStop(0, a.c);
+      grad.addColorStop(1, "transparent");
+      bgCtx.fillStyle = grad;
+      bgCtx.beginPath();
+      bgCtx.ellipse(a.x, a.y, a.lebar, a.lebar * 0.45, 0, 0, Math.PI * 2);
+      bgCtx.fill();
+    });
+
+    bintang.forEach(s => {
+      s.fase += s.kecepatan;
+      s.x += s.vx;
+      s.y += s.vy;
+      if (s.x < 0) s.x = bgCanvas.width;
+      if (s.x > bgCanvas.width) s.x = 0;
+      if (s.y > bgCanvas.height) { s.y = 0; s.x = Math.random() * bgCanvas.width; }
+      const kilau = (Math.sin(s.fase) + 1) / 2;
+      bgCtx.beginPath();
+      bgCtx.fillStyle = `rgba(244,242,250,${0.25 + kilau * 0.65})`;
+      bgCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      bgCtx.fill();
+    });
+
+    requestAnimationFrame(animasiBg);
+  }
+  animasiBg();
+
+  /* ============================================================
+     BAGIAN 1: AUDIO — bikin nada ambient tanpa file eksternal
+     ============================================================ */
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function mainkanNada(frekuensi, durasi, volume) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = frekuensi;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + durasi);
+    osc.start();
+    osc.stop(audioCtx.currentTime + durasi);
+  }
+
+  // suara "denting" tunggal, dipakai di section pembuka & timeline
+  function nadaLembut() { mainkanNada(440, 1.5, 0.15); }
+  function nadaHangat() { mainkanNada(523, 1.2, 0.12); }
+
+  // suara "letusan" kembang api, dipakai di section finale
+  function nadaLetusan() {
+    const freq = 300 + Math.random() * 400;
+    mainkanNada(freq, 0.8, 0.1);
+  }
+
+  /* ============================================================
+     BAGIAN 2: PINDAH ANTAR SECTION
+     ============================================================ */
+  const sectionPembuka = document.querySelector(".pembuka");
+  const sectionTimeline = document.getElementById("sectionTimeline");
+  const sectionFinale = document.querySelector(".finale");
+
+  function pindahKe(sectionTujuan) {
+    document.querySelectorAll("section").forEach(s => s.classList.remove("active"));
+    sectionTujuan.classList.add("active");
+  }
+
+  document.getElementById("mulaiBtn").addEventListener("click", () => {
+    nadaLembut();
+    pindahKe(sectionTimeline);
+    pindahMusik("timeline");
+  });
+
+  document.getElementById("lanjutFinaleBtn").addEventListener("click", () => {
+    nadaHangat();
+    pindahKe(sectionFinale);
+    mulaiKelopak();
+    pindahMusik("finale");
+  });
+
+  /* ============================================================
+     BAGIAN 3: TOMBOL "BUTUH BANTUAN?" YANG KABUR
+     ============================================================ */
+  const dodgeBtn = document.getElementById("dodgeBtn");
+  const dodgeZone = document.querySelector(".dodge-zone");
+  const dodgeNote = document.getElementById("dodgeNote");
+  const lanjutFinaleBtn = document.getElementById("lanjutFinaleBtn");
+  let dodges = 0;
+  const maxDodges = 3;
+  const catatan = ["eh, gerak...", "masih belum mau dibantu ya", "oke oke, terakhir nih"];
+
+  function tryDodge() {
+    if (dodges >= maxDodges) { catchButton(); return; }
+    const zoneRect = dodgeZone.getBoundingClientRect();
+    const btnRect = dodgeBtn.getBoundingClientRect();
+    const maxX = (zoneRect.width - btnRect.width) / 2 - 4;
+    const maxY = (zoneRect.height - btnRect.height) / 2 - 4;
+    const x = (Math.random() * 2 - 1) * maxX;
+    const y = (Math.random() * 2 - 1) * maxY;
+    dodgeBtn.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+    dodgeNote.textContent = catatan[dodges];
+    dodges++;
+  }
+
+  function catchButton() {
+    dodgeBtn.classList.add("caught");
+    dodgeBtn.textContent = "Ya udah, makasih ya 🎂";
+    dodgeBtn.style.transform = "translate(-50%,-50%)";
+    dodgeNote.textContent = "kadang semandiri-mandirinya orang, boleh sesekali dibantu.";
+    lanjutFinaleBtn.style.display = "inline-block";
+  }
+
+  dodgeBtn.addEventListener("mouseenter", () => {
+    if (!dodgeBtn.classList.contains("caught")) tryDodge();
+  });
+  dodgeBtn.addEventListener("click", () => {
+    if (dodgeBtn.classList.contains("caught")) return;
+    // di HP, klik & mouseenter kadang nembak bareng — cek dulu sisa dodge-nya
+    if (dodges >= maxDodges) {
+      catchButton();
+    } else {
+      tryDodge();
+    }
+  });
+/* ============================================================
+     BAGIAN 4: MUSIK LATAR — 3 track, gantian per section dengan fade halus
+     ============================================================ */
+  const semuaMusik = {
+    pembuka: document.getElementById("musikPembuka"),
+    timeline: document.getElementById("musikTimeline"),
+    finale: document.getElementById("musikFinale")
+  };
+  Object.values(semuaMusik).forEach(a => {
+    a.volume = 0;
+    a.playPromise = null; // buat nampung status play() yang lagi berjalan
+  });
+
+  let musikAktif = null;
+  const volumeTarget = 0.3;
+
+ function clampVolume(v) {
+    return Math.max(0, Math.min(1, v));
+  }
+
+  function fadeOutMusik(audio, durasi = 900) {
+    if (!audio || audio.paused) return;
+    const volAwal = audio.volume;
+    const waktuMulai = performance.now();
+    function langkah(t) {
+      const progres = Math.min((t - waktuMulai) / durasi, 1);
+      audio.volume = clampVolume(volAwal * (1 - progres));
+      if (progres < 1) {
+        requestAnimationFrame(langkah);
+      } else {
+        Promise.resolve(audio.playPromise).catch(() => {}).then(() => audio.pause());
+      }
+    }
+    requestAnimationFrame(langkah);
+  }
+
+  function fadeInMusik(audio, durasi = 900) {
+    audio.volume = 0;
+    audio.playPromise = audio.play().catch(() => {
+      // beberapa browser masih nolak sampai ada interaksi lagi, aman diabaikan
+    });
+    const waktuMulai = performance.now();
+    function langkah(t) {
+      const progres = Math.min((t - waktuMulai) / durasi, 1);
+      audio.volume = clampVolume(volumeTarget * progres);
+      if (progres < 1) requestAnimationFrame(langkah);
+    }
+    requestAnimationFrame(langkah);
+  }
+
+  // pindah musik sesuai section: "pembuka", "timeline", atau "finale"
+  function pindahMusik(kunci) {
+    const target = semuaMusik[kunci];
+    if (musikAktif === target) return;
+    fadeOutMusik(musikAktif);
+    fadeInMusik(target);
+    musikAktif = target;
+  }
+
+  // browser cuma ngizinin audio bunyi setelah ada interaksi user —
+  // jadi musik pembuka dipicu di sentuhan/klik PERTAMA di halaman
+  document.addEventListener("pointerdown", () => pindahMusik("pembuka"), { once: true });
+
+  /* ============================================================
+     BAGIAN 5: KARTU FINALE — buka kartu, tampilkan surat baris per baris
+     ============================================================ */
+  const sampul = document.getElementById("sampul");
+  const urutanMuncul = ["eyebrow", "judulIsi", "divider", "p1", "p2", "p3", "p4", "ttd"];
+
+  document.getElementById("kartuTertutup").addEventListener("click", () => {
+    pindahMusik("finale");
+    sampul.classList.add("hidden");
+    urutanMuncul.forEach((id, i) => {
+      setTimeout(() => {
+        document.getElementById(id).classList.add("show");
+      }, 500 + i * 550);
+    });
+  });
+
+  /* ============================================================
+     BAGIAN 6: KELOPAK JATUH DI FINALE — lembut, terus-menerus
+     ============================================================ */
+  const petalCanvas = document.getElementById("petalCanvas");
+  const petalCtx = petalCanvas.getContext("2d");
+  let kelopakJalan = false;
+
+  function resizePetal() {
+    petalCanvas.width = petalCanvas.offsetWidth;
+    petalCanvas.height = petalCanvas.offsetHeight;
+  }
+  window.addEventListener("resize", resizePetal);
+
+  const warnaKelopak = ["#F1B6A6", "#E8C79A", "#D9A6C2", "#F4D9B8"];
+  let kelopak = [];
+
+  function buatKelopak() {
+    return {
+      x: Math.random() * petalCanvas.width,
+      y: -20,
+      size: Math.random() * 10 + 8,
+      warna: warnaKelopak[Math.floor(Math.random() * warnaKelopak.length)],
+      vy: Math.random() * 0.5 + 0.35,
+      vx: Math.random() * 0.4 - 0.2,
+      rot: Math.random() * Math.PI * 2,
+      vrot: (Math.random() - 0.5) * 0.02,
+      goyang: Math.random() * Math.PI * 2
+    };
+  }
+
+  function gambarKelopak(p) {
+    petalCtx.save();
+    petalCtx.translate(p.x, p.y);
+    petalCtx.rotate(p.rot);
+    petalCtx.fillStyle = p.warna;
+    petalCtx.globalAlpha = 0.75;
+    petalCtx.beginPath();
+    petalCtx.ellipse(0, 0, p.size, p.size * 0.6, 0, 0, Math.PI * 2);
+    petalCtx.fill();
+    petalCtx.restore();
+  }
+
+  function animasiKelopak() {
+    petalCtx.clearRect(0, 0, petalCanvas.width, petalCanvas.height);
+    kelopak.forEach(p => {
+      p.goyang += 0.02;
+      p.y += p.vy;
+      p.x += p.vx + Math.sin(p.goyang) * 0.4;
+      p.rot += p.vrot;
+      gambarKelopak(p);
+    });
+    kelopak = kelopak.filter(p => p.y < petalCanvas.height + 30);
+    while (kelopak.length < 14) kelopak.push(buatKelopak());
+    if (kelopakJalan) requestAnimationFrame(animasiKelopak);
+  }
+
+  function mulaiKelopak() {
+    if (kelopakJalan) return;
+    resizePetal();
+    kelopakJalan = true;
+    animasiKelopak();
+  }
+</script>
+
+</body>
+</html>
