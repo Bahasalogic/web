@@ -508,19 +508,15 @@
     sectionTujuan.classList.add("active");
   }
 
-  document.getElementById("mulaiBtn").addEventListener("click", () => {
-    nadaLembut();
+ document.getElementById("mulaiBtn").addEventListener("click", () => {
     pindahKe(sectionTimeline);
     pindahMusik("timeline");
-  });
-
-  document.getElementById("lanjutFinaleBtn").addEventListener("click", () => {
-    nadaHangat();
+});
+ document.getElementById("lanjutFinaleBtn").addEventListener("click", () => {
     pindahKe(sectionFinale);
     mulaiKelopak();
     pindahMusik("finale");
-  });
-
+});
   /* ============================================================
      BAGIAN 3: TOMBOL "BUTUH BANTUAN?" YANG KABUR
      ============================================================ */
