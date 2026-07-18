@@ -134,12 +134,13 @@
     margin-top: 1.5rem;
   }
 
-  #dodgeBtn {
+ #dodgeBtn {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     white-space: nowrap;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
   #dodgeBtn.caught {
@@ -547,24 +548,37 @@
   const maxDodges = 3;
   const catatan = ["eh, gerak...", "masih belum mau dibantu ya...", "oke oke, terakhir nih..."];
 
-  // device yang beneran punya hover mouse (bukan HP/touchscreen)
   const adaHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
-  // biar reaksinya kelihatan walau user belum scroll ke bawah
   function pastikanTerlihat(el) {
     el.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  function tryDodge() {
+  function tryDodge(e) {
     if (dodges >= maxDodges) { catchButton(); return; }
     const zoneRect = dodgeZone.getBoundingClientRect();
     const btnRect = dodgeBtn.getBoundingClientRect();
     const maxX = (zoneRect.width - btnRect.width) / 2 - 4;
     const maxY = (zoneRect.height - btnRect.height) / 2 - 4;
-    const x = (Math.random() * 2 - 1) * maxX;
-    const y = (Math.random() * 2 - 1) * maxY;
-    dodgeBtn.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+
+    let x, y;
+    if (e && typeof e.clientX === "number") {
+      // kabur menjauhi posisi kursor/jari, bukan cuma acak
+      const px = e.clientX - zoneRect.left - zoneRect.width / 2;
+      const py = e.clientY - zoneRect.top - zoneRect.height / 2;
+      const arah = Math.atan2(-py, -px) + (Math.random() - 0.5) * 1.2;
+      const jarak = 0.55 + Math.random() * 0.45;
+      x = Math.max(-maxX, Math.min(maxX, Math.cos(arah) * maxX * jarak));
+      y = Math.max(-maxY, Math.min(maxY, Math.sin(arah) * maxY * jarak));
+    } else {
+      x = (Math.random() * 2 - 1) * maxX;
+      y = (Math.random() * 2 - 1) * maxY;
+    }
+
+    const goyang = (Math.random() - 0.5) * 14;
+    dodgeBtn.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${goyang}deg)`;
     dodgeNote.textContent = catatan[dodges];
+    if (navigator.vibrate) navigator.vibrate(30);
     dodges++;
     pastikanTerlihat(dodgeZone);
   }
@@ -573,25 +587,23 @@
     dodgeBtn.classList.add("caught");
     dodgeBtn.textContent = "Ya sudah, makasih ya... 🎂";
     dodgeBtn.style.transform = "translate(-50%,-50%)";
-    dodgeNote.textContent = "kadang semandiri-mandirinya orang, bolehlah sesekali aku bantu hehehe....";
+    dodgeNote.textContent = "kadang semandiri-mandirinya orang, bolehlah sesekali aku bantu kamu hehehe....";
     lanjutFinaleBtn.style.display = "inline-block";
     pastikanTerlihat(lanjutFinaleBtn);
   }
 
-  // di desktop (ada mouse hover): tombol kabur begitu didekati kursor
   if (adaHover) {
-    dodgeBtn.addEventListener("mouseenter", () => {
-      if (!dodgeBtn.classList.contains("caught")) tryDodge();
+    dodgeBtn.addEventListener("mouseenter", (e) => {
+      if (!dodgeBtn.classList.contains("caught")) tryDodge(e);
     });
   }
 
-  // klik/tap: di HP ini satu-satunya pemicu (1 tap = 1 dodge)
-  dodgeBtn.addEventListener("click", () => {
+  dodgeBtn.addEventListener("click", (e) => {
     if (dodgeBtn.classList.contains("caught")) return;
     if (dodges >= maxDodges) {
       catchButton();
     } else {
-      tryDodge();
+      tryDodge(e);
     }
   });
 /* ============================================================
