@@ -567,8 +567,13 @@
     el.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  function tryDodge(e) {
+ function tryDodge(e) {
     if (dodges >= maxDodges) { catchButton(); return; }
+
+    // "bekukan" index dodge saat ini SEBELUM dodges bertambah,
+    // biar setTimeout di bawah pakai nilai yang benar, bukan yang udah berubah
+    const indeksDodge = dodges;
+    dodges++;
 
     // hentikan napas idle & mainkan ancang-ancang singkat dulu
     dodgeBtn.classList.add("kabur");
@@ -593,23 +598,21 @@
     }
 
     const goyang = (Math.random() - 0.5) * 22;
-    const durasi = 0.32 + Math.random() * 0.22; // tiap lompatan beda kecepatan
+    const durasi = 0.32 + Math.random() * 0.22;
     const per = ["cubic-bezier(0.36,1.9,0.64,1)", "cubic-bezier(0.22,2.2,0.5,1)", "cubic-bezier(0.3,1.6,0.6,1)"][Math.floor(Math.random()*3)];
 
-    // tunggu ancang-ancang selesai (180ms), baru meledak ke posisi baru
     setTimeout(() => {
       dodgeBtn.style.animation = "";
       dodgeBtn.style.transition = `translate ${durasi}s ${per}, rotate ${durasi}s ${per}`;
       dodgeBtn.style.translate = `calc(-50% + ${x}px) calc(-50% + ${y}px)`;
       dodgeBtn.style.rotate = `${goyang}deg`;
-      dodgeNote.textContent = catatan[dodges];
+      dodgeNote.textContent = catatan[indeksDodge];
       if (navigator.vibrate) navigator.vibrate([15, 30, 15]);
     }, 180);
 
-    dodges++;
     pastikanTerlihat(dodgeZone);
   }
-
+ 
   function catchButton() {
     dodgeBtn.classList.add("caught");
     dodgeBtn.style.animation = "";
