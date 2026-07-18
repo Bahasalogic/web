@@ -536,7 +536,7 @@
     mulaiKelopak();
     pindahMusik("finale");
 });
-  /* ============================================================
+ /* ============================================================
      BAGIAN 3: TOMBOL "BUTUH BANTUAN?" YANG KABUR
      ============================================================ */
   const dodgeBtn = document.getElementById("dodgeBtn");
@@ -550,6 +550,11 @@
   // device yang beneran punya hover mouse (bukan HP/touchscreen)
   const adaHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
+  // biar reaksinya kelihatan walau user belum scroll ke bawah
+  function pastikanTerlihat(el) {
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
   function tryDodge() {
     if (dodges >= maxDodges) { catchButton(); return; }
     const zoneRect = dodgeZone.getBoundingClientRect();
@@ -561,14 +566,16 @@
     dodgeBtn.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
     dodgeNote.textContent = catatan[dodges];
     dodges++;
+    pastikanTerlihat(dodgeZone);
   }
 
   function catchButton() {
     dodgeBtn.classList.add("caught");
     dodgeBtn.textContent = "Ya sudah, makasih ya... 🎂";
     dodgeBtn.style.transform = "translate(-50%,-50%)";
-    dodgeNote.textContent = "kadang semandiri-mandirinya orang, bolehlah sesekali aku bantu hehehe....";
+    dodgeNote.textContent = "kadang semandiri-mandirinya orang, bolehlah sesekali aku dibantu hehehe....";
     lanjutFinaleBtn.style.display = "inline-block";
+    pastikanTerlihat(lanjutFinaleBtn);
   }
 
   // di desktop (ada mouse hover): tombol kabur begitu didekati kursor
@@ -579,7 +586,6 @@
   }
 
   // klik/tap: di HP ini satu-satunya pemicu (1 tap = 1 dodge)
-  // di desktop ini cuma jaga-jaga kalau somehow kena klik langsung
   dodgeBtn.addEventListener("click", () => {
     if (dodgeBtn.classList.contains("caught")) return;
     if (dodges >= maxDodges) {
