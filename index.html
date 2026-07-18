@@ -385,7 +385,7 @@
       <p class="paragraf" id="p3">Aku tau kamu emang tipe orang yang kuat, biasa ngadepin semuanya sendirian tanpa banyak ngeluh. Tapi sesekali boleh kok dikit-dikit direpotin, nggak harus jadi siapa-siapa dulukan buat bisa peduli?</p>
       <p class="paragraf" id="p4">Semoga tahun ini semua rencana kamu lancar, dan semoga kamu makin sadar banyak orang yang seneng ada kamu di sekitarnya, salah satunya aku, hehehe... Selamat ulang tahun yaaa...<br> Nindy 🎉</p>
 
-      <p class="tanda-tangan script" id="ttd">— dari temen Mu {Irul} —</p>
+      <p class="tanda-tangan script" id="ttd">— dari temen Mu Irul —</p>
     </div>
    <div class="copyright-bottom-left">
     &copy;Copyright 2026,Mega Multimedia.Official. All Rights Reserved.
@@ -547,6 +547,9 @@
   const maxDodges = 3;
   const catatan = ["eh, gerak...", "masih belum mau dibantu ya...", "oke oke, terakhir nih..."];
 
+  // device yang beneran punya hover mouse (bukan HP/touchscreen)
+  const adaHover = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
   function tryDodge() {
     if (dodges >= maxDodges) { catchButton(); return; }
     const zoneRect = dodgeZone.getBoundingClientRect();
@@ -568,12 +571,17 @@
     lanjutFinaleBtn.style.display = "inline-block";
   }
 
-  dodgeBtn.addEventListener("mouseenter", () => {
-    if (!dodgeBtn.classList.contains("caught")) tryDodge();
-  });
+  // di desktop (ada mouse hover): tombol kabur begitu didekati kursor
+  if (adaHover) {
+    dodgeBtn.addEventListener("mouseenter", () => {
+      if (!dodgeBtn.classList.contains("caught")) tryDodge();
+    });
+  }
+
+  // klik/tap: di HP ini satu-satunya pemicu (1 tap = 1 dodge)
+  // di desktop ini cuma jaga-jaga kalau somehow kena klik langsung
   dodgeBtn.addEventListener("click", () => {
     if (dodgeBtn.classList.contains("caught")) return;
-    // di HP, klik & mouseenter kadang nembak bareng — cek dulu sisa dodge-nya
     if (dodges >= maxDodges) {
       catchButton();
     } else {
